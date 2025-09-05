@@ -12,6 +12,24 @@ return {
             staticcheck = true,
           },
         },
+        on_attach = function(_, bufnr)
+          local opts = { noremap = true, silent = true, buffer = bufnr }
+
+          -- Jump to definition
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+
+          -- Show references
+          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+
+          -- Hover docs
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+
+          -- Implementation
+          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+
+          -- Rename symbol
+          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+        end,
       }
     end,
   },
