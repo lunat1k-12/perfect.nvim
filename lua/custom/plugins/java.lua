@@ -56,11 +56,13 @@ return {
 
     -- Keymaps for Java-specific actions
     local opts = { noremap = true, silent = true }
-    vim.keymap.set('n', '<leader>oi', jdtls.organize_imports, opts)
-    vim.keymap.set('n', '<leader>ev', jdtls.extract_variable, opts)
-    vim.keymap.set('v', '<leader>em', jdtls.extract_method, opts)
-    vim.keymap.set('n', '<leader>tc', jdtls.test_class, opts)
-    vim.keymap.set('n', '<leader>tm', jdtls.test_nearest_method, opts)
-    vim.keymap.set('n', '<leader>cx', vim.diagnostic.open_float, opts)
+    vim.keymap.set('n', '<leader>co', jdtls.organize_imports, { desc = 'Organize imports' })
+    vim.keymap.set('n', '<leader>cv', jdtls.extract_variable, { noremap = true, silent = true, desc = 'Extract variable' })
+    vim.keymap.set('v', '<leader>ce', jdtls.extract_method, { noremap = true, silent = true, desc = 'Extract method' })
+    vim.keymap.set('n', '<leader>ctc', jdtls.test_class, { noremap = true, silent = true, desc = 'Test Class' })
+    vim.keymap.set('n', '<leader>ctm', jdtls.test_nearest_method, { noremap = true, silent = true, desc = 'Test Nearest method' })
+    vim.keymap.set('n', '<leader>cx', vim.diagnostic.open_float, { desc = 'Show exception details' })
+    vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, { desc = 'Go to definition' })
+    vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { desc = 'Go to implementation' })
   end,
 }
