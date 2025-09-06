@@ -27,13 +27,10 @@ return {
     }
     vim.list_extend(bundles, vim.split(vim.fn.glob(home .. '/.local/share/nvim/mason/packages/java-test/extension/server/*.jar', 1), '\n'))
 
-    local lombok_path = home .. '/.local/share/java/lombok.jar'
-
     local config = {
       cmd = {
-        home .. '/.local/share/nvim/mason/packages/jdtls/bin/jdtls',
-        '-data',
-        workspace_dir,
+        vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
+        string.format('--jvm-arg=-javaagent:%s', vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
       },
       root_dir = root_dir,
       settings = {
