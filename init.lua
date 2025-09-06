@@ -413,6 +413,16 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          file_ignore_patterns = {
+            '%.class$', -- skip compiled Java class files
+            '%.exe$', -- skip executables
+            '%.o$', -- skip object files
+            '%.jar$', -- skip jar files
+            'node_modules', -- skip folders
+            'dist', -- skip folders
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
