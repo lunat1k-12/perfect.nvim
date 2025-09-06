@@ -13,22 +13,20 @@ return {
           },
         },
         on_attach = function(_, bufnr)
-          local opts = { noremap = true, silent = true, buffer = bufnr }
-
           -- Jump to definition
-          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+          vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, { noremap = true, silent = true, buffer = bufnr, desc = 'Go to definition' })
 
           -- Show references
-          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+          vim.keymap.set('n', '<leader>cr', vim.lsp.buf.references, { noremap = true, silent = true, buffer = bufnr, desc = 'References' })
 
           -- Hover docs
-          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, { noremap = true, silent = true, buffer = bufnr, desc = 'Hover docs' })
 
           -- Implementation
-          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+          vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { noremap = true, silent = true, buffer = bufnr, desc = 'Go To implementation' })
 
           -- Rename symbol
-          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+          vim.keymap.set('n', '<leader>cn', vim.lsp.buf.rename, { noremap = true, silent = true, buffer = bufnr, desc = 'Rename symbol' })
         end,
       }
     end,

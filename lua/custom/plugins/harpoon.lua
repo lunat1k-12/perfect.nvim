@@ -19,5 +19,8 @@ return {
     vim.keymap.set('n', '<leader>et', function()
       harpoon.ui:toggle_quick_menu(harpoon:list())
     end, { desc = 'Toggle list' })
+    vim.keymap.set('n', '<leader>er', function()
+      harpoon:list():remove()
+    end, { desc = 'Remove from list' })
   end,
 }
