@@ -421,6 +421,7 @@ require('lazy').setup({
             '%.jar$', -- skip jar files
             'node_modules', -- skip folders
             'dist', -- skip folders
+            '.build', -- java build folder
           },
         },
         extensions = {
