@@ -11,98 +11,97 @@ return {
     local jdtls = require 'jdtls'
     local home = vim.fn.getenv 'HOME'
 
-    -- Find project root
     local root_markers = { '.git', 'mvnw', 'gradlew', 'pom.xml', 'build.gradle' }
-    local root_dir = require('jdtls.setup').find_root(root_markers)
-    if root_dir == '' then
-      return
-    end
 
-    -- Workspace directory (each project gets its own)
-    local workspace_dir = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
+    local function attach_jdtls()
+      local root_dir = require('jdtls.setup').find_root(root_markers)
+      if root_dir == '' then
+        return
+      end
 
-    -- Debug/test bundles
-    local bundles = {
-      vim.fn.glob(home .. '/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar', 1),
-    }
-    vim.list_extend(bundles, vim.split(vim.fn.glob(home .. '/.local/share/nvim/mason/packages/java-test/extension/server/*.jar', 1), '\n'))
+      -- Workspace dir per project
+      local workspace_dir = home .. '/.local/share/eclipse/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
 
-    local config = {
-      cmd = {
-        vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
-        string.format('--jvm-arg=-javaagent:%s', vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
-        '-data',
-        workspace_dir,
-      },
-      root_dir = root_dir,
-      settings = {
-        java = {
-          signatureHelp = { enabled = true },
-          contentProvider = { preferred = 'fernflower' },
-          completion = {
-            favoriteStaticMembers = {
-              'org.mockito.Mockito.*',
-              'org.springframework.*',
-              'org.junit.Assert.*',
+      -- Debug/test bundles
+      local bundles = {
+        vim.fn.glob(home .. '/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar', 1),
+      }
+      vim.list_extend(bundles, vim.split(vim.fn.glob(home .. '/.local/share/nvim/mason/packages/java-test/extension/server/*.jar', 1), '\n'))
+
+      local config = {
+        cmd = {
+          vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
+          string.format('--jvm-arg=-javaagent:%s', vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
+          '-data',
+          workspace_dir,
+        },
+        root_dir = root_dir,
+        settings = {
+          java = {
+            signatureHelp = { enabled = true },
+            contentProvider = { preferred = 'fernflower' },
+            completion = {
+              favoriteStaticMembers = {
+                'org.mockito.Mockito.*',
+                'org.springframework.*',
+                'org.junit.Assert.*',
+              },
             },
           },
         },
-      },
-      init_options = {
-        bundles = bundles,
-      },
-    }
-
-    -- Start or attach JDTLS
-    jdtls.start_or_attach(config)
-
-    -- Integrate DAP with JDTLS (enables debug via nvim-dap)
-    -- hotcodereplace 'auto' allows hotswap when possible
-    jdtls.setup_dap { hotcodereplace = 'auto' }
-
-    -- Also provide Launch configurations for Java main classes so you don't need a remote JVM
-    -- This prevents common ECONNREFUSED errors when using an Attach config without a listening JVM
-    if jdtls.setup_dap_main_class then
-      jdtls.setup_dap_main_class {
-        -- You can tweak default launch options here
-        -- Example: show program I/O in the integrated terminal
-        config_overrides = { console = 'integratedTerminal' },
+        init_options = {
+          bundles = bundles,
+        },
       }
+
+      jdtls.start_or_attach(config)
+
+      -- Setup DAP integration
+      jdtls.setup_dap { hotcodereplace = 'auto' }
+      if jdtls.setup_dap_main_class then
+        jdtls.setup_dap_main_class {
+          config_overrides = { console = 'integratedTerminal' },
+        }
+      end
+
+      if jdtls.setup and jdtls.setup.add_commands then
+        jdtls.setup.add_commands()
+      end
+
+      local dap_ok, dap = pcall(require, 'dap')
+      if dap_ok then
+        dap.configurations.java = dap.configurations.java or {}
+        table.insert(dap.configurations.java, 1, {
+          type = 'java',
+          name = 'Debug (Attach) - Remote JVM',
+          request = 'attach',
+          hostName = function()
+            return vim.fn.input('Host (default 127.0.0.1): ', '127.0.0.1')
+          end,
+          port = function()
+            local input = vim.fn.input('Port (default 5005): ', '5005')
+            return tonumber(input)
+          end,
+        })
+      end
+
+      -- Java-specific keymaps
+      local opts = { noremap = true, silent = true }
+      vim.keymap.set('n', '<leader>co', jdtls.organize_imports, { desc = 'Organize imports' })
+      vim.keymap.set('n', '<leader>cv', jdtls.extract_variable, { desc = 'Extract variable' })
+      vim.keymap.set('v', '<leader>ce', jdtls.extract_method, { desc = 'Extract method' })
+      vim.keymap.set('n', '<leader>ctc', jdtls.test_class, { desc = 'Test Class' })
+      vim.keymap.set('n', '<leader>ctm', jdtls.test_nearest_method, { desc = 'Test Nearest method' })
+      vim.keymap.set('n', '<leader>cx', vim.diagnostic.open_float, { desc = 'Show exception details' })
+      vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, { desc = 'Go to definition' })
+      vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { desc = 'Go to implementation' })
+      vim.keymap.set('n', '<leader>cr', vim.lsp.buf.references, { desc = 'Finde references' })
     end
 
-    -- Optional: add common JDTLS commands
-    if jdtls.setup and jdtls.setup.add_commands then
-      jdtls.setup.add_commands()
-    end
-
-    -- Provide a convenient Remote Attach configuration using JDTLS adapter
-    local dap_ok, dap = pcall(require, 'dap')
-    if dap_ok then
-      dap.configurations.java = dap.configurations.java or {}
-      -- Insert at the beginning so it shows near the top in UI pickers
-      table.insert(dap.configurations.java, 1, {
-        type = 'java',
-        name = 'Debug (Attach) - Remote JVM',
-        request = 'attach',
-        hostName = function()
-          return vim.fn.input('Host (default 127.0.0.1): ', '127.0.0.1')
-        end,
-        port = function()
-          local input = vim.fn.input('Port (default 5005): ', '5005')
-          return tonumber(input)
-        end,
-      })
-    end
-
-    -- Keymaps for Java-specific actions
-    local opts = { noremap = true, silent = true }
-    vim.keymap.set('n', '<leader>co', jdtls.organize_imports, { desc = 'Organize imports' })
-    vim.keymap.set('n', '<leader>cv', jdtls.extract_variable, { noremap = true, silent = true, desc = 'Extract variable' })
-    vim.keymap.set('v', '<leader>ce', jdtls.extract_method, { noremap = true, silent = true, desc = 'Extract method' })
-    vim.keymap.set('n', '<leader>ctc', jdtls.test_class, { noremap = true, silent = true, desc = 'Test Class' })
-    vim.keymap.set('n', '<leader>ctm', jdtls.test_nearest_method, { noremap = true, silent = true, desc = 'Test Nearest method' })
-    vim.keymap.set('n', '<leader>cx', vim.diagnostic.open_float, { desc = 'Show exception details' })
-    vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, { desc = 'Go to definition' })
-    vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { desc = 'Go to implementation' })
+    -- Attach jdtls every time a Java buffer is opened
+    vim.api.nvim_create_autocmd('FileType', {
+      pattern = 'java',
+      callback = attach_jdtls,
+    })
   end,
 }
