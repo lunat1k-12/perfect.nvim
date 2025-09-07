@@ -27,6 +27,14 @@ return {
 
           -- Rename symbol
           vim.keymap.set('n', '<leader>cn', vim.lsp.buf.rename, { noremap = true, silent = true, buffer = bufnr, desc = 'Rename symbol' })
+          vim.keymap.set('n', '<leader>co', function()
+            vim.lsp.buf.code_action {
+              context = {
+                only = { 'source.organizeImports' },
+              },
+              apply = true,
+            }
+          end, { desc = 'Organize Imports' })
         end,
       }
     end,
