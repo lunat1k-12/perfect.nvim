@@ -95,7 +95,8 @@ return {
       vim.keymap.set('n', '<leader>cx', vim.diagnostic.open_float, { desc = 'Show exception details' })
       vim.keymap.set('n', '<leader>cd', vim.lsp.buf.definition, { desc = 'Go to definition' })
       vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { desc = 'Go to implementation' })
-      vim.keymap.set('n', '<leader>cr', vim.lsp.buf.references, { desc = 'Finde references' })
+      vim.keymap.set('n', '<leader>cr', vim.lsp.buf.references, { desc = 'Find references' })
+      vim.keymap.set('n', '<leader>cw', vim.lsp.buf.hover, { desc = 'Document' })
     end
 
     -- Attach jdtls every time a Java buffer is opened
