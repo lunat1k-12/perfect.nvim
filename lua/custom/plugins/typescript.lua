@@ -43,11 +43,10 @@ return {
         map('n', '<leader>cn', vim.lsp.buf.rename, 'Rename symbol')
         map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code action')
         map('n', '<leader>co', function()
-          -- Organize imports using TS server command
-          vim.lsp.buf.execute_command {
+          vim.lsp.buf_request(0, 'workspace/executeCommand', {
             command = '_typescript.organizeImports',
             arguments = { vim.api.nvim_buf_get_name(0) },
-          }
+          })
         end, 'TS Organize Imports')
       end
 

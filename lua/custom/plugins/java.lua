@@ -97,6 +97,9 @@ return {
       vim.keymap.set('n', '<leader>ci', vim.lsp.buf.implementation, { desc = 'Go to implementation' })
       vim.keymap.set('n', '<leader>cr', vim.lsp.buf.references, { desc = 'Find references' })
       vim.keymap.set('n', '<leader>cw', vim.lsp.buf.hover, { desc = 'Document' })
+      vim.keymap.set('n', '<leader>cb', function()
+        require('dap').toggle_breakpoint()
+      end, { desc = 'Set breakpoint' })
     end
 
     -- Attach jdtls every time a Java buffer is opened
