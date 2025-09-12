@@ -102,7 +102,7 @@ vim.g.have_nerd_font = true
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -159,7 +159,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
+vim.o.scrolloff = 15
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -220,7 +220,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'java',
+  pattern = { 'go', 'gomod', 'gotmpl', 'java', 'ts' },
   callback = function()
     vim.bo.expandtab = true -- use spaces instead of tabs
     vim.bo.shiftwidth = 4 -- number of spaces per indent level
@@ -430,7 +430,7 @@ require('lazy').setup({
             '%.jar$', -- skip jar files
             'node_modules', -- skip folders
             'dist', -- skip folders
-            '.build', -- java build folder
+            'build', -- java build folder
           },
         },
         extensions = {
@@ -735,6 +735,8 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'google-java-format',
+        'crlfmt',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -787,6 +789,12 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        java = { 'google-java-format' },
+        go = {
+          'crlfmt',
+          -- add args to disable tabs and set tab width to 4 spaces
+          args = { '-tabs=false', '-tabwidth=4' },
+        },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
