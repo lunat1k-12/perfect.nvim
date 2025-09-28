@@ -47,6 +47,14 @@ return {
                 'org.junit.Assert.*',
               },
             },
+            format = {
+              enabled = true,
+              settings = {
+                -- Point to your custom XML file
+                url = vim.fn.expand '~/.config/nvim/config/java-style.xml',
+                profile = 'GoogleStyle', -- Can be any name
+              },
+            },
           },
         },
         init_options = {
