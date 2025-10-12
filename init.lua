@@ -220,7 +220,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'java', 'ts' },
+  pattern = { 'java', 'ts', 'tsx' },
   callback = function()
     vim.bo.expandtab = true -- use spaces instead of tabs
     vim.bo.shiftwidth = 4 -- number of spaces per indent level
