@@ -30,6 +30,7 @@ return {
       map('n', '<leader>ci', vim.lsp.buf.implementation, 'Go to implementation')
       map('n', '<leader>cn', vim.lsp.buf.rename, 'Rename symbol')
       map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code action')
+      map('n', '<leader>cx', vim.diagnostic.open_float, 'Show exception details')
 
       if client.name == 'ts_ls' then
         map('n', '<leader>co', function()
