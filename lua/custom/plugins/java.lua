@@ -95,6 +95,8 @@ return {
 
       -- Java-specific keymaps
       local opts = { noremap = true, silent = true }
+
+      vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Code Action' })
       vim.keymap.set('n', '<leader>co', jdtls.organize_imports, { desc = 'Organize imports' })
       vim.keymap.set('n', '<leader>cv', jdtls.extract_variable, { desc = 'Extract variable' })
       vim.keymap.set('v', '<leader>ce', jdtls.extract_method, { desc = 'Extract method' })
