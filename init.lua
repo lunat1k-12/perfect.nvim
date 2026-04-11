@@ -138,6 +138,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			map("n", "<leader>ctc", jdtls.test_class, "Test Class")
 			map("n", "<leader>ctm", jdtls.test_nearest_method, "Test Nearest Method")
 		end
+
+		if client and client:supports_method("textDocument/completion") then
+			vim.lsp.completion.enable(true, ev.data.client_id, bufnr, { autotrigger = true })
+			vim.keymap.set("i", "<C-n>", function()
+				return vim.fn.pumvisible() == 1 and "<C-n>" or "<C-x><C-o>"
+			end, { buffer = bufnr, expr = true, desc = "Next completion item" })
+			vim.keymap.set("i", "<C-p>", function()
+				return vim.fn.pumvisible() == 1 and "<C-p>" or "<C-p>"
+			end, { buffer = bufnr, expr = true, desc = "Previous completion item" })
+			vim.keymap.set("i", "<C-y>", function()
+				return vim.fn.pumvisible() == 1 and "<C-y>" or "<C-y>"
+			end, { buffer = bufnr, expr = true, desc = "Confirm completion" })
+		end
 	end,
 })
 
