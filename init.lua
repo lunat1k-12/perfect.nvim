@@ -141,15 +141,25 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		if client and client:supports_method("textDocument/completion") then
 			vim.lsp.completion.enable(true, ev.data.client_id, bufnr, { autotrigger = true })
+			vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
+			local function feedkey(key)
+				vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, false, true), "n", false)
+			end
 			vim.keymap.set("i", "<C-n>", function()
-				return vim.fn.pumvisible() == 1 and "<C-n>" or "<C-x><C-o>"
-			end, { buffer = bufnr, expr = true, desc = "Next completion item" })
+				if vim.fn.pumvisible() == 1 then
+					feedkey("<C-n>")
+				elseif vim.lsp.completion.trigger then
+					vim.lsp.completion.trigger()
+				else
+					feedkey("<C-x><C-o>")
+				end
+			end, { buffer = bufnr, desc = "Next completion item" })
 			vim.keymap.set("i", "<C-p>", function()
-				return vim.fn.pumvisible() == 1 and "<C-p>" or "<C-p>"
-			end, { buffer = bufnr, expr = true, desc = "Previous completion item" })
+				feedkey(vim.fn.pumvisible() == 1 and "<C-p>" or "<C-p>")
+			end, { buffer = bufnr, desc = "Previous completion item" })
 			vim.keymap.set("i", "<C-y>", function()
-				return vim.fn.pumvisible() == 1 and "<C-y>" or "<C-y>"
-			end, { buffer = bufnr, expr = true, desc = "Confirm completion" })
+				feedkey(vim.fn.pumvisible() == 1 and "<C-y>" or "<C-y>")
+			end, { buffer = bufnr, desc = "Confirm completion" })
 		end
 	end,
 })
