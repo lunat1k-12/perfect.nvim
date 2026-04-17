@@ -45,6 +45,8 @@ vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
 
+vim.opt.completeopt:append({ "menuone", "noselect", "popup" })
+
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
@@ -75,6 +77,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local bufnr = ev.buf
 		local function map(mode, lhs, rhs, desc)
 			vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, noremap = true, desc = desc })
+		end
+
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client and client:supports_method("textDocument/completion") then
+			vim.lsp.completion.enable(true, client.id, bufnr, {
+				autotrigger = true,
+				convert = function(item)
+					return { abbr = item.label:gsub("%b()", "") }
+				end,
+			})
+			vim.api.nvim_create_autocmd("InsertCharPre", {
+				buffer = bufnr,
+				callback = vim.lsp.completion.get,
+			})
 		end
 
 		map("n", "K", vim.lsp.buf.hover, "LSP Hover")
@@ -132,34 +148,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			vim.lsp.buf.format({ async = true })
 		end, "Format buffer")
 
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client and client.name == "jdtls" then
 			local jdtls = require("jdtls")
 			map("n", "<leader>ctc", jdtls.test_class, "Test Class")
 			map("n", "<leader>ctm", jdtls.test_nearest_method, "Test Nearest Method")
-		end
-
-		if client and client:supports_method("textDocument/completion") then
-			vim.lsp.completion.enable(true, ev.data.client_id, bufnr, { autotrigger = true })
-			vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-			local function feedkey(key)
-				vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, false, true), "n", false)
-			end
-			vim.keymap.set("i", "<C-n>", function()
-				if vim.fn.pumvisible() == 1 then
-					feedkey("<C-n>")
-				elseif vim.lsp.completion.trigger then
-					vim.lsp.completion.trigger()
-				else
-					feedkey("<C-x><C-o>")
-				end
-			end, { buffer = bufnr, desc = "Next completion item" })
-			vim.keymap.set("i", "<C-p>", function()
-				feedkey(vim.fn.pumvisible() == 1 and "<C-p>" or "<C-p>")
-			end, { buffer = bufnr, desc = "Previous completion item" })
-			vim.keymap.set("i", "<C-y>", function()
-				feedkey(vim.fn.pumvisible() == 1 and "<C-y>" or "<C-y>")
-			end, { buffer = bufnr, desc = "Confirm completion" })
 		end
 	end,
 })
