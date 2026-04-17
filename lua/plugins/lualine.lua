@@ -31,6 +31,16 @@ return {
 					section_separators = { left = '', right = '' },
 				},
 				sections = {
+					lualine_a = {
+						{
+							"mode",
+							color = function()
+								if vim.fn.mode() == "t" then
+									return { bg = "#bd192e", fg = "#ffffff", gui = "bold" }
+								end
+							end,
+						},
+					},
 					lualine_x = {
 						"encoding",
 						"fileformat",
