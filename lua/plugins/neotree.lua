@@ -39,7 +39,7 @@ return {
 							-- Try to infer package name from relative path
 							local cwd = vim.fn.getcwd()
 							local relpath = filepath:gsub("^" .. cwd .. "/?", "")
-							local pkg = relpath:match("src/main/java/(.*)/" .. classname .. "%.java$")
+							local pkg = relpath:match("src/[^/]+/java/(.*)/" .. classname .. "%.java$")
 							pkg = pkg and pkg:gsub("/", ".") or ""
 
 							local lines = {}
