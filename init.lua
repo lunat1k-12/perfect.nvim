@@ -65,7 +65,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
-vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "html", "cssls" })
+vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "html", "cssls", "rust_analyzer" })
 
 
 require("config.jdtls")
